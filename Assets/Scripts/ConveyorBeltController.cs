@@ -6,6 +6,45 @@ using UnityEngine;
 public class ConveyorBeltController : MonoBehaviour
 {
     [SerializeField]
+    public float ItemSpeed
+    { 
+        get
+        {
+            return itemSpeed;
+        }
+
+        set
+        {
+            itemSpeed = value;
+        }
+    }
+
+    public float ConveyorSpeed
+    {
+        get 
+        { 
+            return conveyorSpeed; 
+        }
+        set 
+        { 
+            conveyorSpeed = value; 
+        }
+    }
+
+    public float MaxItemSpeed
+    {
+        get
+        {
+            return maxItemSpeed;
+        }
+
+        set 
+        {
+            maxItemSpeed = value;
+        }
+    }
+
+    [SerializeField]
     private float itemSpeed, maxItemSpeed, conveyorSpeed;
     [SerializeField]
     private Vector3 direction;
@@ -14,6 +53,8 @@ public class ConveyorBeltController : MonoBehaviour
 
     private Material beltMaterial;
 
+
+    #region UnityMethods
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -25,6 +66,12 @@ public class ConveyorBeltController : MonoBehaviour
     {
         // Move the texture of the belt so it looks like the belt is moving
         GetComponent<MeshRenderer>().material.mainTextureOffset -= new Vector2(0, 1) * conveyorSpeed * Time.deltaTime;
+
+        // The max speed will slowly increment so the itemSpeed will eventually need to catch up
+        if (maxItemSpeed > itemSpeed)
+        {
+            itemSpeed = maxItemSpeed;
+        }
     }
 
     private void FixedUpdate()
@@ -55,7 +102,9 @@ public class ConveyorBeltController : MonoBehaviour
             }
         }
     }
+    #endregion UnityMethods
 
+    #region CollisionMethods
     private void OnCollisionEnter(Collision collision)
     {
         onBelt.Add(collision.gameObject);
@@ -65,4 +114,5 @@ public class ConveyorBeltController : MonoBehaviour
     {
         onBelt.Remove(collision.gameObject);
     }
+    #endregion CollisionMethods
 }

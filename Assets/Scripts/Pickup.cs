@@ -39,6 +39,8 @@ public class Pickup : MonoBehaviour
         if(isHolding)
         {
             Hold();
+            rigidBody.linearVelocity = Vector3.zero;
+            rigidBody.angularVelocity = Vector3.zero;
         }
     }
     #endregion UnityMethods
