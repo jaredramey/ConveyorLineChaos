@@ -10,6 +10,8 @@ public class PackageManager : MonoBehaviour
 
     private int numCompletedBoxes = 0;
 
+    AudioSource itemInPackage;
+
     public int NumCompletedBoxes
     {
         get 
@@ -26,6 +28,11 @@ public class PackageManager : MonoBehaviour
     TextMeshPro numItemsText;
 
     #region UnityMethods
+    private void Start()
+    {
+        itemInPackage = GetComponent<AudioSource>();
+    }
+
     private void OnValidate()
     {
         if (numItemsText == null)
@@ -39,6 +46,7 @@ public class PackageManager : MonoBehaviour
     {
         if(collision.gameObject.tag == "ConveyorBeltItem")
         {
+            itemInPackage.Play();
             Destroy(collision.gameObject);
             curNumObjectsInBox++;
 

@@ -129,7 +129,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   throwForce: 600
-  maxDistance: 3
+  maxDistance: 10
 --- !u!65 &-421844214386981505
 BoxCollider:
   m_ObjectHideFlags: 0

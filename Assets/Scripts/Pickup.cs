@@ -39,8 +39,6 @@ public class Pickup : MonoBehaviour
         if(isHolding)
         {
             Hold();
-            rigidBody.linearVelocity = Vector3.zero;
-            rigidBody.angularVelocity = Vector3.zero;
         }
     }
     #endregion UnityMethods
@@ -97,6 +95,7 @@ public class Pickup : MonoBehaviour
                 rigidBody.useGravity = false;
                 rigidBody.detectCollisions = true;
 
+                this.transform.position = hands.transform.position;
                 this.transform.SetParent(hands.transform);
             }
         }

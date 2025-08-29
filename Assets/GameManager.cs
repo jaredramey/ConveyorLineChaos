@@ -33,7 +33,19 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     GameObject itemSpawner;
     ConveyorBeltItemSpawner conveyorBeltItemSpawner;
+    [SerializeField]
     float itemSpawnTimeReduction = 0.05f;
+
+    [Header("Item Destroyer components")]
+    [SerializeField]
+    GameObject itemDestroyer;
+    ItemDestroyerController itemDestroyerController;
+
+    [Header("End Screen components")]
+    GameOverScreen gameOverScreen;
+    [SerializeField]
+    TextMeshPro missedPackagesTMP;
+    private int previousMissedPackages = 0;
 
     [Header("Game Variables")]
     float totalShiftTime = 0f;
@@ -47,6 +59,10 @@ public class GameManager : MonoBehaviour
         packageManager = package.GetComponent<PackageManager>();
 
         conveyorBeltItemSpawner = itemSpawner.GetComponent<ConveyorBeltItemSpawner>();
+
+        itemDestroyerController = itemDestroyer.GetComponent<ItemDestroyerController>();
+
+        gameOverScreen = gameObject.GetComponent<GameOverScreen>();
     }
 
     // Update is called once per frame
@@ -58,6 +74,9 @@ public class GameManager : MonoBehaviour
 
         //Update num completed boxes
         UpdateCompletedBoxesText();
+
+        // Update num missed items
+        UpdateMissedPackages();
 
         // GAME LOGIC RELATED
         nextIncrementTime += Time.deltaTime;
@@ -73,6 +92,8 @@ public class GameManager : MonoBehaviour
     {
         // Update the belt speed text. Shouldn't have to do this often.
         UpdateBeltSpeedText();
+
+        CheckForFailState();
     }
     #endregion UnityMethods
 
@@ -104,15 +125,44 @@ public class GameManager : MonoBehaviour
             packagesFinishedTMP.text = previousNumCompletedBoxes.ToString();
         }
     }
+
+    private void UpdateMissedPackages()
+    {
+        if(itemDestroyerController.NumMissedPackages > previousMissedPackages)
+        {
+            previousMissedPackages = itemDestroyerController.NumMissedPackages;
+            missedPackagesTMP.text = previousMissedPackages.ToString();
+        }
+    }
     #endregion TextRelated
 
     #region GameLogic
     private void IncreaseBeltSpeed()
     {
-        conveyorBeltController.ConveyorSpeed += beltSpeedIncrement;
-        conveyorBeltController.MaxItemSpeed += 5;
+        // Increase the spawn rate of items
+        if (conveyorBeltItemSpawner.spawningCooldownTime - itemSpawnTimeReduction > 0.5)
+        {
+            conveyorBeltItemSpawner.spawningCooldownTime -= itemSpawnTimeReduction;
+            // If the spawn rate gets too high then we need to increase the belt speed
+            // We only want to do this when the spawn rate is at least 1 item per second and
+            // only when its a whole number.
+            // Won't lie this is a hacky solution at best.
+            // TODO: Clean this mess up
+            if(conveyorBeltItemSpawner.spawningCooldownTime <= 1 &&
+                (int)conveyorBeltItemSpawner.spawningCooldownTime == conveyorBeltItemSpawner.spawningCooldownTime)
+            {
+                conveyorBeltController.ConveyorSpeed += beltSpeedIncrement;
+                conveyorBeltController.MaxItemSpeed += 4;
+            }
+        }
+    }
 
-        conveyorBeltItemSpawner.spawningCooldownTime -= itemSpawnTimeReduction;
+    private void CheckForFailState()
+    {
+       if(itemDestroyerController.NumMissedPackages >= itemDestroyerController.MaxMissedPackages)
+        {
+            gameOverScreen.EndGame();
+        }
     }
     #endregion GameLogic
 }

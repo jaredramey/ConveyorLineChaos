@@ -51,6 +51,8 @@ public class ConveyorBeltController : MonoBehaviour
     [SerializeField]
     private List<GameObject> onBelt;
 
+    AudioSource fallingAffect;
+
     private Material beltMaterial;
 
 
@@ -59,6 +61,7 @@ public class ConveyorBeltController : MonoBehaviour
     void Start()
     {
         beltMaterial = GetComponent<Material>();
+        fallingAffect = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -107,12 +110,19 @@ public class ConveyorBeltController : MonoBehaviour
     #region CollisionMethods
     private void OnCollisionEnter(Collision collision)
     {
-        onBelt.Add(collision.gameObject);
+        if (collision.gameObject.tag == "ConveyorBeltItem")
+        {
+            fallingAffect.Play();
+            onBelt.Add(collision.gameObject);
+        }
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        onBelt.Remove(collision.gameObject);
+        if (collision.gameObject.tag == "ConveyorBeltItem")
+        {
+            onBelt.Remove(collision.gameObject);
+        }
     }
     #endregion CollisionMethods
 }
